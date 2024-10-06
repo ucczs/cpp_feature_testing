@@ -30,6 +30,8 @@ class DerivedAndOverride : public BaseWithVirtual {
     virtual void printAnything() const override { std::cout << "class DerivedAndOverride function" << std::endl; };
 };
 
+void myFunction() { std::cout << "class Derived function" << std::endl; }
+
 int main() {
     Base base = Base();
     Derived derived = Derived();
@@ -42,9 +44,9 @@ int main() {
     std::cout << "*********************************" << std::endl;
     std::cout << "size BaseWithVirtual\t= " << sizeof(baseWithVirtual) << std::endl;
     std::cout << "size DerivedAndOverride\t= " << sizeof(derivedAndOverride) << std::endl;
-    std::cout << std::endl << "-> Difference in size due to the virtual pointer which points to the vtable." << std::endl << std::endl;
+    std::cout << std::endl << "-> Difference in size due to the virtual pointer which points to the vtable." << std::endl;
 
-    std::cout << "*********************************" << std::endl;
+    std::cout << std::endl << "*********************************" << std::endl;
     std::cout << "*********************************" << std::endl << std::endl;
 
     std::cout << "derived.printSomething():" << std::endl << "\t";
@@ -58,6 +60,21 @@ int main() {
     BaseWithVirtual* baseVirtualPointer = &derivedAndOverride;
     std::cout << "BaseWithVirtual* baseVirtualPointer = &derivedAndOverride:" << std::endl << "\t";
     baseVirtualPointer->printAnything();
+
+    std::cout << std::endl << "*********************************" << std::endl;
+    std::cout << "*********************************" << std::endl << std::endl;
+
+    uint64_t** virtual_pointer = reinterpret_cast<uint64_t**>(&baseWithVirtual);
+    std::cout << std::hex << "Pointer to virtual function from vtable:\t\t" << *virtual_pointer << std::endl;
+    std::cout << "(accessed via address of an object and virtual pointer)" << std::endl << std::endl;
+
+    typedef void (BaseWithVirtual::*printAnythingFunctionType)() const;
+    printAnythingFunctionType printAnythingPtr = &BaseWithVirtual::printAnything;
+
+    std::cout << std::hex << "Address of BaseWithVirtual::printAnything:\t\t" << reinterpret_cast<void*&>(printAnythingPtr) << std::endl;
+
+    std::cout << std::endl << "*********************************" << std::endl;
+    std::cout << "*********************************" << std::endl << std::endl;
 
     return 0;
 }
